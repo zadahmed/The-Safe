@@ -99,7 +99,15 @@ contract MultiSigWallet {
     }
 
     function execute(uint _txId) external txExists(_txId) notExecuted(_txId) {
-        
+        require(_getApprovalCount(_txId) >= required,"Approvals is less than required");
+        Transaction storage transaction = transactions[_txId];
+
+        transaction.executed = true;
+        (bool success, ) = transaction.to.call{value: transaction.value}(transaction.data);
+        require(success, "TX has failed");
+        emit Execute(_txId);
     }
+
+    
 
 }
