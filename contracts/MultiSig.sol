@@ -36,6 +36,21 @@ contract MultiSigWallet {
         _;
     }
 
+    modifier txExists(uint _txId ){
+        require(_txId < transactions.length,"TX does not exist");
+        _;
+    }
+
+    modifier notApproved(uint _txId){
+        require(!approved[_txId][msg.sender],"The TX already has been approved");
+        _;
+    }
+
+    modifier notExecuted(uint _txId) {
+        require(transactions[_txId].executed, "Tx has already been executed");
+        _;
+    }
+
     constructor(address[] memory _owners, uint _required) {
         require(_owners.length > 0, "Owners required");
         require(
@@ -68,4 +83,12 @@ contract MultiSigWallet {
         );
         emit Submit(transactions.length - 1);
     }
+
+
+    function approve(uint _txId) external onlyOwner txExists(_txId) notApproved(_txId) notExecuted(_txId){
+        approved[_txId][msg.sender] = true;
+        emit Approve(msg.sender, _txId);
+    }
+
+    
 }
