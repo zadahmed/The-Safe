@@ -32,6 +32,12 @@ contract MultiSigWallet {
     // Showcase Transaction is approved by owner or not for a specific execution approva
     mapping(uint => mapping(address => bool)) public approved;
 
+
+    modifier onlyOwner(){
+        require(isOwner[msg.sender],"The user is not owner");
+        _;
+    }
+
     constructor(address[] memory _owners, uint _required)  {
         require(_owners.length > 0, "Owners required");
         require(_required > 0 && required <= _owners.length, "Invalid requirement number of owners");
@@ -51,5 +57,9 @@ contract MultiSigWallet {
         emit Deposit(msg.sender,msg.value);
     }
 
+
+    function submit(address _to, uint _value, bytes calldata _data) external onlyOwner{
+        
+    }
 
 }
